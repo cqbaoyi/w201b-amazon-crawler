@@ -46,21 +46,28 @@ class AmazonCrawler:
         Returns:
             List of product dictionaries with details and reviews
         """
-        logger.info(f"Starting crawl for keyword: {keyword}")
         
-        # Check robots.txt compliance
+        if crawl_reviews and not self.auth.is_authenticated():
+            print("Authentication required for review access.")
+            try:
+                if input("Authenticate now? (y/n): ").lower() == 'y':
+                    if not self.auth.authenticate():
+                        print("Authentication failed. Proceeding without reviews.")
+                        crawl_reviews = False
+                else:
+                    crawl_reviews = False
+            except EOFError:
+                crawl_reviews = False
+        
         if not self.robots_checker.can_crawl("/s"):
-            logger.warning("Robots.txt disallows crawling search results")
             return []
         
         # Search for products
         products = self.searcher.search_products(keyword, max_results)
         
-        # Filter by rating if specified
         if min_rating > 0:
             products = self.parser.filter_by_rating(products, min_rating)
         
-        # Crawl reviews for each product if requested
         if crawl_reviews:
             for product in products:
                 if product.get('url'):
@@ -72,15 +79,10 @@ class AmazonCrawler:
                         )
                         product['reviews'] = reviews
                     except Exception as e:
-                        logger.warning(f"Error crawling reviews: {e}")
                         product['reviews'] = []
-                    
                     time.sleep(self.delay)
         
-        # Add delay between requests
         time.sleep(self.delay)
-        
-        logger.info(f"Found {len(products)} products")
         return products
     
     def crawl_reviews(self, product_url: str, max_pages: int = 2) -> List[Dict]:

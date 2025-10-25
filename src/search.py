@@ -37,50 +37,20 @@ class AmazonSearcher:
             # Construct Amazon search URL
             search_url = f"{self.base_url}/s?k={keyword.replace(' ', '+')}"
             
-            # Set headers to mimic a real browser more convincingly
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                 'Accept-Language': 'en-US,en;q=0.9',
-                'Accept-Encoding': 'gzip, deflate, br',
-                'Cache-Control': 'no-cache',
-                'Pragma': 'no-cache',
-                'Sec-Ch-Ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
-                'Sec-Ch-Ua-Mobile': '?0',
-                'Sec-Ch-Ua-Platform': '"Windows"',
-                'Sec-Fetch-Dest': 'document',
-                'Sec-Fetch-Mode': 'navigate',
-                'Sec-Fetch-Site': 'none',
-                'Sec-Fetch-User': '?1',
-                'Upgrade-Insecure-Requests': '1',
-                'DNT': '1',
             }
             
             # Add a small delay to be respectful
             time.sleep(1)
             
-            # Make the request with retry logic
-            max_retries = 3
-            for attempt in range(max_retries):
-                try:
-                    response = self.session.get(search_url, headers=headers, timeout=30)
-                    response.raise_for_status()
-                    break
-                except requests.RequestException as e:
-                    if attempt < max_retries - 1:
-                        logger.warning(f"Request failed (attempt {attempt + 1}/{max_retries}): {e}")
-                        time.sleep(2 ** attempt)  # Exponential backoff
-                    else:
-                        raise
+            response = self.session.get(search_url, headers=headers, timeout=30)
+            response.raise_for_status()
             
-            # Parse the HTML
             soup = BeautifulSoup(response.content, 'html.parser')
-            
-            # Extract product information
-            products = self._parse_search_results(soup, max_results)
-            
-            logger.info(f"Found {len(products)} products from Amazon")
-            return products
+            return self._parse_search_results(soup, max_results)
             
         except requests.RequestException as e:
             logger.error(f"Error searching Amazon: {e}")

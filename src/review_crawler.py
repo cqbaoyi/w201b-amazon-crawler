@@ -22,7 +22,7 @@ class ReviewCrawler:
         self.base_url = "https://www.amazon.com"
         
     def crawl_product_reviews(self, product_url: str, max_pages: int = 2, 
-                            max_reviews_per_page: int = 10) -> List[Dict]:
+                            max_reviews_per_page: int = 5) -> List[Dict]:
         """
         Crawl reviews for a specific product with pagination support.
         
@@ -34,7 +34,6 @@ class ReviewCrawler:
         Returns:
             List of review dictionaries
         """
-        logger.info(f"Starting review crawl for product: {product_url}")
         
         all_reviews = []
         current_page = 1
@@ -46,17 +45,14 @@ class ReviewCrawler:
                 return []
             
             while current_page <= max_pages:
-                # Construct paginated URL
                 page_url = self._add_pagination_to_url(reviews_url, current_page)
-                
-                # Make request to reviews page
                 reviews = self._crawl_reviews_page(page_url, max_reviews_per_page)
                 
                 if not reviews:
                     break
                 
                 all_reviews.extend(reviews)
-                time.sleep(1)  # Delay between pages
+                time.sleep(1)
                 current_page += 1
                 
         except Exception as e:

@@ -135,6 +135,9 @@ celerybeat.pid
 # SageMath parsed files
 *.sage.py
 
+# Session files
+cookies.json
+
 # Environments
 .env
 .envrc

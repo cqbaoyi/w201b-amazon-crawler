@@ -25,18 +25,10 @@ class AmazonParser:
         """Extract review information from reviews section."""
         reviews = []
         
-        # Find review containers - Amazon uses different selectors for reviews
         review_selectors = [
             '[data-hook="review"]',
-            'div[data-hook="review"]',
-            '.a-section[data-hook="review"]',
             '.cr-original-review-item',
-            '.a-section.cr-original-review-item',
-            '.a-section.a-spacing-small.review',
-            '.a-section.review',
-            '.review',
-            '[id*="customer-review"]',
-            '.a-section.a-spacing-none.review'
+            '.a-section.review'
         ]
         
         review_elements = []
@@ -46,7 +38,6 @@ class AmazonParser:
                 review_elements = elements
                 break
         
-        logger.info(f"Found {len(review_elements)} review elements")
         
         
         for element in review_elements:

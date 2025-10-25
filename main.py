@@ -62,6 +62,11 @@ def main():
     # Initialize crawler
     crawler = AmazonCrawler(delay=2.0)
     
+    if crawler.auth.is_authenticated():
+        print("✅ Authenticated session found")
+    else:
+        print("⚠️  No authenticated session found")
+    
     # Search for products
     products = crawler.crawl_products(
         keyword=keyword,
