@@ -85,16 +85,3 @@ class AmazonCrawler:
         time.sleep(self.delay)
         return products
     
-    def crawl_reviews(self, product_url: str, max_pages: int = 2) -> List[Dict]:
-        """
-        Crawl reviews for a specific product.
-        
-        Args:
-            product_url: URL of the product
-            max_pages: Maximum number of review pages to crawl
-            
-        Returns:
-            List of review dictionaries
-        """
-        logger.info(f"Crawling reviews for: {product_url}")
-        return self.review_crawler.crawl_product_reviews(product_url, max_pages)
